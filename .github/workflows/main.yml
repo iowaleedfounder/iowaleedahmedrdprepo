@@ -1,0 +1,32 @@
+name: Windows - LiteManager
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Start Building...
+    runs-on: windows-latest
+    timeout-minutes: 9999
+
+    steps:
+      - name: Check for 16GB RAM
+        run: |
+          $ram = (Get-WmiObject Win32_ComputerSystem).TotalPhysicalMemory / 1GB
+          if ($ram -lt 16) {
+            Write-Host "This machine does not have enough RAM. Required: 16GB, Available: $ram GB"
+            exit 1
+          } else {
+            Write-Host "Machine has sufficient RAM: $ram GB"
+          }
+
+      - name: Downloading & Installing Essentials
+        run: |
+          Invoke-WebRequest -Uri "https://gitlab.com/chamod12/lm_win-10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
+          cmd /c Downloads.bat
+
+      - name: Connect to LiteManager
+        run: cmd /c show.bat
+
+      - name: Time Counter
+        run: cmd /c loop.bat
